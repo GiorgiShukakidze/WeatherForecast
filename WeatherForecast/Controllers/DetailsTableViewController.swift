@@ -11,7 +11,7 @@ import UIKit
 class DetailsTableViewController: UITableViewController {
     
     var selectedCity: City?
-    private var weatherData: Weather?
+    private var weatherData: [Weather]?
     private var spinnerView = UIActivityIndicatorView()
 
     override func viewDidLoad() {
@@ -55,15 +55,15 @@ class DetailsTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return weatherData?.daily.count ?? 0
+        return weatherData?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.weatherDetailsCellIdentifier, for: indexPath)
         
-        if let weatherInfo = weatherData?.daily[indexPath.row] {
-            cell.textLabel?.text = "\(String(format: "%.1f", weatherInfo.temp.day)) °C"
-            cell.detailTextLabel?.text = "\(formatedDate(for: weatherInfo.dt))"
+        if let weatherInfo = weatherData?[indexPath.row] {
+            cell.textLabel?.text = weatherInfo.temperature
+            cell.detailTextLabel?.text = weatherInfo.date
         }
         
         return cell
@@ -85,10 +85,4 @@ class DetailsTableViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
     }
-    
-    private func formatedDate(for date: Int) -> String {
-        let formattedDate = Date(timeIntervalSince1970: Double(date))
-        return DateFormatter.localizedString(from: formattedDate, dateStyle: .medium , timeStyle: .none)
-    }
-
 }

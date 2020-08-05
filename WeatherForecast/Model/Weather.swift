@@ -1,5 +1,5 @@
 //
-//  WeatherData.swift
+//  Weather.swift
 //  WeatherForecast
 //
 //  Created by Giorgi Shukakidze on 8/5/20.
@@ -8,16 +8,7 @@
 
 import Foundation
 
-struct Weather: Codable {
-    let daily: [WeatherData]
-    
-}
-
-struct WeatherData: Codable {
-    let dt: Int
-    let temp: TemperatureData
-}
-
-struct TemperatureData: Codable {
-    let day: Double
+struct Weather {
+    let temperature: String
+    let date: String
 }

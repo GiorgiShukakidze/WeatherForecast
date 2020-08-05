@@ -15,7 +15,7 @@ class WeatherManager {
     private let baseUrl = "https://api.openweathermap.org/data/2.5/onecall?exclude=current,hourly&units=metric&appid=\(Keys.weatherAppId)"
     
     
-    func fetchWeahter(for city: City, completion: @escaping (Result<Weather,Error>) -> Void ) {
+    func fetchWeahter(for city: City, completion: @escaping (Result<[Weather],Error>) -> Void ) {
         
         let url = "\(baseUrl)&lat=\(city.lat)&lon=\(city.lon)"
         
@@ -30,7 +30,16 @@ class WeatherManager {
             if let safeData = data, error == nil {
                 
                 if let weatherData = self.parseJSON(for: safeData) {
-                    completion(.success(weatherData))
+                    
+                    var weatherInfo = [Weather]()
+                    
+                    weatherData.daily.forEach { (data) in
+                        let temperature = "\(String(format: "%.1f", data.temp.day)) °C"
+                        let date = "\(self.formatedDate(for: data.dt))"
+                        weatherInfo.append(Weather(temperature: temperature, date: date))
+                    }
+                    
+                    completion(.success(weatherInfo))
                 }
             } else {
                 print("error: \(error!.localizedDescription)")
@@ -39,17 +48,20 @@ class WeatherManager {
         }.resume()
     }
     
-    private func parseJSON(for data: Data) -> Weather? {
+    private func parseJSON(for data: Data) -> WeatherModel? {
         
         do {
-            let decodedData = try JSONDecoder().decode(Weather.self, from: data)
-            
+            let decodedData = try JSONDecoder().decode(WeatherModel.self, from: data)
             return decodedData
         } catch {
             print(error.localizedDescription)
-            
             return nil
         }
+    }
+    
+    private func formatedDate(for date: Int) -> String {
+        let formattedDate = Date(timeIntervalSince1970: Double(date))
+        return DateFormatter.localizedString(from: formattedDate, dateStyle: .medium , timeStyle: .none)
     }
     
 }
